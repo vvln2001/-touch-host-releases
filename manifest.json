@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "serial": 1,
+  "issued_at": "2026-10-12T10:32:47Z",
+  "expires_at": null,
+  "channel": "stable",
+  "assets": [
+    {
+      "id": "host-win64-2.4.0",
+      "type": "host",
+      "model": "ASDM02A-Host",
+      "platform": "win64",
+      "version": "2.4.0",
+      "urls": [
+        "https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.0/ASDM02A-Host-2.4.0-win64.zip",
+        "https://gh-proxy.com/https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.0/ASDM02A-Host-2.4.0-win64.zip"
+      ],
+      "min_compatible": "",
+      "notes": "新增自动更新：连接调试器后自动检查新版本，一键更新并显示全程进度；配套调试器固件 V1.8.1（低于此版本时自动升级）；实时 CSV 默认保存到 用户目录\\ASDM02A-Host\\trace_logs；修复若干问题。",
+      "forced": false,
+      "debugger_version": "1.8.1",
+      "file": "ASDM02A-Host-2.4.0-win64.zip",
+      "size": 90679116,
+      "sha256": "f55a4f512f62d0b5a3e121613326587a0c28fe27a65ccc2a20461cb177f1f199"
+    },
+    {
+      "id": "debugger-asdm02a-1.8.1",
+      "type": "debugger",
+      "model": "ASDM02A",
+      "version": "1.8.1",
+      "urls": [
+        "https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.0/ASDM02A_V1.8.1_gcc.hex",
+        "https://gh-proxy.com/https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.0/ASDM02A_V1.8.1_gcc.hex"
+      ],
+      "min_compatible": "",
+      "notes": "",
+      "forced": false,
+      "file": "ASDM02A_V1.8.1_gcc.hex",
+      "size": 124096,
+      "sha256": "bbc5ae66468abdfc7d90208bba3eafb28868cc6ba9345437089b09130de3736c"
+    }
+  ]
+}
