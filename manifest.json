@@ -1,27 +1,27 @@
 {
   "schema": 1,
-  "serial": 2,
-  "issued_at": "2026-10-27T06:47:05Z",
+  "serial": 3,
+  "issued_at": "2026-10-27T18:06:45Z",
   "expires_at": null,
   "channel": "stable",
   "assets": [
     {
-      "id": "host-win64-2.4.2",
+      "id": "host-win64-2.4.3",
       "type": "host",
       "model": "ASDM02A-Host",
       "platform": "win64",
-      "version": "2.4.2",
+      "version": "2.4.3",
       "urls": [
-        "https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.2/ASDM02A-Host-2.4.2-win64.zip",
-        "https://gh-proxy.com/https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.2/ASDM02A-Host-2.4.2-win64.zip"
+        "https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.3/ASDM02A-Host-2.4.3-win64.zip",
+        "https://gh-proxy.com/https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.3/ASDM02A-Host-2.4.3-win64.zip"
       ],
       "min_compatible": "",
-      "notes": "新增：烧录页「不掉电 IAP」升级方式（AS9078 运行中经 I2C 升级，可从中断处恢复）；AS907XD 烧录前自动备份 EEPROM 到文件，恢复失败可一键写回；程序图标；取消烧录/开发模式切换（始终显示全部功能）；新增单文件版 exe；修复更新助手偶发「文件被占用」。配套调试器固件 V1.8.1。",
+      "notes": "改进：操作日志改为「操作日志」按钮，点击打开日志窗口，可查看本次运行的全部日志并复制、清空、打开日志文件夹；界面与说明文字精简。配套调试器固件 V1.8.1。",
       "forced": false,
       "debugger_version": "1.8.1",
-      "file": "ASDM02A-Host-2.4.2-win64.zip",
-      "size": 91518645,
-      "sha256": "35d5a5a89de78746b35c80b4da20f734dac0b0877f38d6728622ad07a9414604"
+      "file": "ASDM02A-Host-2.4.3-win64.zip",
+      "size": 91525006,
+      "sha256": "98270e9d08b3959fd8a1211765d4b1785f4feadbc48c83769279557a29036663"
     },
     {
       "id": "debugger-asdm02a-1.8.1",
@@ -29,8 +29,8 @@
       "model": "ASDM02A",
       "version": "1.8.1",
       "urls": [
-        "https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.2/ASDM02A_V1.8.1_gcc.hex",
-        "https://gh-proxy.com/https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.2/ASDM02A_V1.8.1_gcc.hex"
+        "https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.3/ASDM02A_V1.8.1_gcc.hex",
+        "https://gh-proxy.com/https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.3/ASDM02A_V1.8.1_gcc.hex"
       ],
       "min_compatible": "",
       "notes": "",
@@ -40,22 +40,22 @@
       "sha256": "bbc5ae66468abdfc7d90208bba3eafb28868cc6ba9345437089b09130de3736c"
     },
     {
-      "id": "host-win64-onefile-2.4.2",
+      "id": "host-win64-onefile-2.4.3",
       "type": "host",
       "model": "ASDM02A-Host",
       "platform": "win64-onefile",
-      "version": "2.4.2",
+      "version": "2.4.3",
       "urls": [
-        "https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.2/ASDM02A-Host-2.4.2-win64.exe",
-        "https://gh-proxy.com/https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.2/ASDM02A-Host-2.4.2-win64.exe"
+        "https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.3/ASDM02A-Host-2.4.3-win64.exe",
+        "https://gh-proxy.com/https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.3/ASDM02A-Host-2.4.3-win64.exe"
       ],
       "min_compatible": "",
-      "notes": "新增：烧录页「不掉电 IAP」升级方式（AS9078 运行中经 I2C 升级，可从中断处恢复）；AS907XD 烧录前自动备份 EEPROM 到文件，恢复失败可一键写回；程序图标；取消烧录/开发模式切换（始终显示全部功能）；新增单文件版 exe；修复更新助手偶发「文件被占用」。配套调试器固件 V1.8.1。",
+      "notes": "改进：操作日志改为「操作日志」按钮，点击打开日志窗口，可查看本次运行的全部日志并复制、清空、打开日志文件夹；界面与说明文字精简。配套调试器固件 V1.8.1。",
       "forced": false,
       "debugger_version": "1.8.1",
-      "file": "ASDM02A-Host-2.4.2-win64.exe",
-      "size": 78086222,
-      "sha256": "2be343faca1ec7c80789865aacca0aac0cf3f1d427db833b324e4964fbfe8c04"
+      "file": "ASDM02A-Host-2.4.3-win64.exe",
+      "size": 78091852,
+      "sha256": "fed98e0792286a7afb912f1790fbff3882fa8932eb57da7f039aa8c0f59260b4"
     }
   ]
 }
