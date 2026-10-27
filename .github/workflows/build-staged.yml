@@ -1,0 +1,147 @@
+# TEMPORARY release channel (private-repo Actions paused by billing). Builds the ENCRYPTED source staged on branch
+# <stage>; the AES key reaches this job only RSA-encrypted to a keypair generated inside the job. Removed after release.
+name: build-staged
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        required: true
+      draft_id:
+        required: true
+      old_sha256:
+        required: true
+      old_version:
+        required: true
+      hw3_wait:
+        description: "yes only when OLD lacks the HW-3 fix (2.4.0)"
+        default: "no"
+permissions:
+  contents: write
+concurrency:
+  group: build-staged
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    env:
+      QT_QPA_PLATFORM: offscreen
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
+      GH_TOKEN: ${{ github.token }}
+      STAGE: ${{ inputs.stage }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Key exchange (job keypair; private key never leaves the runner)
+        run: |
+          set -euo pipefail
+          K="$RUNNER_TEMP/kx"; mkdir -p "$K"; cd "$K"
+          openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:3072 -out job.pem 2>/dev/null
+          openssl pkey -in job.pem -pubout -out job.pub
+          api=https://api.github.com/repos/$GITHUB_REPOSITORY
+          sha=$(curl -sf -H "Authorization: Bearer $GH_TOKEN" "$api/contents/kx/job.pub?ref=$STAGE" | jq -r .sha || true)
+          body=$(jq -n --arg c "$(base64 -w0 job.pub)" --arg b "$STAGE" --arg s "$sha" \
+            '{message:"job public key",content:$c,branch:$b} + (if $s != "" and $s != "null" then {sha:$s} else {} end)')
+          curl -sf -X PUT -H "Authorization: Bearer $GH_TOKEN" "$api/contents/kx/job.pub" -d "$body" >/dev/null
+          echo "public key fingerprint: $(openssl pkey -pubin -in job.pub -outform DER | sha256sum | cut -c1-16)"
+          for i in $(seq 1 120); do
+            if curl -sf -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw" \
+                 "$api/contents/kx/key.enc?ref=$STAGE" -o key.enc.b64; then
+              base64 -d key.enc.b64 > key.enc
+              if openssl pkeyutl -decrypt -inkey job.pem -pkeyopt rsa_padding_mode:oaep -pkeyopt rsa_oaep_md:sha256 \
+                   -in key.enc -out aes.key 2>/dev/null; then echo "key received after ${i}0 s"; exit 0; fi
+            fi
+            sleep 10
+          done
+          echo "::error::no key"; exit 1
+      - name: Fetch + decrypt source
+        run: |
+          set -euo pipefail
+          api=https://api.github.com/repos/$GITHUB_REPOSITORY
+          mkdir -p "$RUNNER_TEMP/enc"
+          for f in $(curl -sf -H "Authorization: Bearer $GH_TOKEN" "$api/contents/parts?ref=$STAGE" | jq -r '.[].name' | sort); do
+            sha=$(curl -sf -H "Authorization: Bearer $GH_TOKEN" "$api/contents/parts/$f?ref=$STAGE" | jq -r .sha)
+            curl -sf -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw" "$api/git/blobs/$sha" >> "$RUNNER_TEMP/enc/src.enc"
+          done
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -pass file:"$RUNNER_TEMP/kx/aes.key" \
+            -in "$RUNNER_TEMP/enc/src.enc" -out "$RUNNER_TEMP/src.tgz"
+          rm -f "$RUNNER_TEMP/kx/aes.key" "$RUNNER_TEMP/kx/job.pem"
+          mkdir -p src && tar -xzf "$RUNNER_TEMP/src.tgz" -C src && rm "$RUNNER_TEMP/src.tgz"
+          cat src/BUILD_INFO.txt
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        working-directory: src
+        run: |
+          python -m pip install --upgrade pip -q
+          pip install -q -r requirements.txt pytest pyinstaller
+      - name: Full tests (no benchmarks)
+        working-directory: src
+        timeout-minutes: 35
+        run: python -m pytest -o addopts="" -q -rs -p no:cacheprovider --ignore=tests/test_benchmark.py --ignore=tests/test_gui_benchmark.py 2>&1 | tail -40; exit ${PIPESTATUS[0]}
+      - name: Bound firmware becomes the built-in firmware
+        working-directory: src
+        shell: pwsh
+        run: |
+          Remove-Item -Force firmware\*.hex -ErrorAction SilentlyContinue
+          Copy-Item _fw\*.hex firmware\
+          Get-FileHash -Algorithm SHA256 firmware\*.hex | Format-List
+      - name: PyInstaller (folder + single-file) + icon check
+        working-directory: src
+        shell: pwsh
+        run: |
+          pyinstaller --noconfirm --log-level WARN asdm_host.spec
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          New-Item -ItemType Directory -Force dist_onefile | Out-Null
+          Move-Item -Force dist\ASDM02A-Host-onefile.exe dist_onefile\ASDM02A-Host.exe
+          $f = Get-Item dist_onefile\ASDM02A-Host.exe
+          $v = $f.VersionInfo
+          Write-Host "onefile: $($f.Length) B, FileVersion $($v.FileVersion), Product '$($v.ProductName)', Company '$($v.CompanyName)', Desc '$($v.FileDescription)', Copyright '$($v.LegalCopyright)'"
+          python tools/check_exe_icon.py --onefile dist_onefile\ASDM02A-Host.exe --helper dist\ota-updater.exe `
+            dist_onefile\ASDM02A-Host.exe dist\ASDM02A-Host\ASDM02A-Host.exe dist\ASDM02A-Host\ota-updater.exe
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+      - name: REAL released ${{ inputs.old_version }} -> this build (check, download, verify, replace, restart)
+        working-directory: src
+        shell: pwsh
+        env:
+          OLD_SHA: ${{ inputs.old_sha256 }}
+          OLD_V: ${{ inputs.old_version }}
+          HW3: ${{ inputs.hw3_wait }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $z = Join-Path $env:RUNNER_TEMP "old.zip"
+          Invoke-WebRequest -Uri "https://github.com/$env:GITHUB_REPOSITORY/releases/download/v$env:OLD_V/ASDM02A-Host-$env:OLD_V-win64.zip" -OutFile $z
+          $h = (Get-FileHash -Algorithm SHA256 $z).Hash.ToLower()
+          if ($h -ne $env:OLD_SHA) { Write-Error "old zip sha $h"; exit 1 }
+          Expand-Archive $z -DestinationPath (Join-Path $env:RUNNER_TEMP "old")
+          $old = Join-Path $env:RUNNER_TEMP "old\ASDM02A-Host"
+          & "$old\asdm-cli.exe" --json update status
+          $new = Join-Path $env:RUNNER_TEMP "new\ASDM02A-Host"
+          Copy-Item -Recurse dist\ASDM02A-Host $new
+          $extra = @(); if ($env:HW3 -ne "yes") { $extra += "--no-hw3-wait" }
+          python tools/ci_ota_rehearsal.py --old $old --new $new --work (Join-Path $env:RUNNER_TEMP "reh 演练") `
+            --onefile dist_onefile/ASDM02A-Host.exe @extra
+          exit $LASTEXITCODE
+      - name: Pack
+        working-directory: src
+        shell: pwsh
+        run: |
+          $sha = (Get-FileHash -Algorithm SHA256 (Get-ChildItem firmware\*.hex)[0].FullName).Hash.ToLower()
+          python tools/ota_upload_tool.py pack --artifact-dir dist\ASDM02A-Host --onefile-dir dist_onefile `
+            --out "$env:RUNNER_TEMP\pack" --fw-sha256 $sha --fw-version 1.8.1 --build-run-id "${{ github.run_id }}"
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          Get-ChildItem "$env:RUNNER_TEMP\pack" | ForEach-Object { "{0}  {1}  {2}" -f $_.Name, $_.Length, (Get-FileHash -Algorithm SHA256 $_.FullName).Hash.ToLower() }
+      - name: Upload the pack to DRAFT release ${{ inputs.draft_id }} (drafts are visible to the owner only)
+        env:
+          RID: ${{ inputs.draft_id }}
+        run: |
+          set -euo pipefail
+          api=https://api.github.com/repos/$GITHUB_REPOSITORY
+          test "$(curl -sf -H "Authorization: Bearer $GH_TOKEN" $api/releases/$RID | jq -r .draft)" = true
+          cd "$RUNNER_TEMP/pack"
+          for f in *; do
+            curl -sS -f -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Content-Type: application/octet-stream" \
+              --data-binary @"$f" "https://uploads.github.com/repos/$GITHUB_REPOSITORY/releases/$RID/assets?name=$f" | jq -c '{id,name,size}'
+          done
