@@ -67,7 +67,7 @@ jobs:
           openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -pass file:"$RUNNER_TEMP/kx/aes.key" \
             -in "$RUNNER_TEMP/enc/src.enc" -out "$RUNNER_TEMP/src.tgz"
           rm -f "$RUNNER_TEMP/kx/aes.key" "$RUNNER_TEMP/kx/job.pem"
-          mkdir -p src && tar -xzf "$RUNNER_TEMP/src.tgz" -C src && rm "$RUNNER_TEMP/src.tgz"
+          mkdir -p src && tar --force-local -xzf "$RUNNER_TEMP/src.tgz" -C src && rm "$RUNNER_TEMP/src.tgz"
           cat src/BUILD_INFO.txt
       - uses: actions/setup-python@v5
         with:
