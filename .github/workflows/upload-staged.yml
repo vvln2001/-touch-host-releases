@@ -1,0 +1,36 @@
+# TEMPORARY (v2.4.2): uploads the files staged on branch staging-v2.4.2 to the given (draft) release of this repo.
+# Removed right after the release, together with the staging branch.
+name: upload-staged
+on:
+  workflow_dispatch:
+    inputs:
+      release_id:
+        required: true
+permissions:
+  contents: write
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: staging-v2.4.2
+      - name: Reassemble + check SHA-256
+        run: |
+          set -euo pipefail
+          mkdir out
+          for f in $(awk '{print $2}' SHA256SUMS); do cat parts/"$f".* > out/"$f"; done
+          cd out && sha256sum -c ../SHA256SUMS && ls -l
+      - name: Upload to release ${{ inputs.release_id }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RID: ${{ inputs.release_id }}
+        run: |
+          set -euo pipefail
+          cd out
+          for f in *; do
+            curl -sS -f -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Content-Type: application/octet-stream" \
+              --data-binary @"$f" "https://uploads.github.com/repos/${GITHUB_REPOSITORY}/releases/${RID}/assets?name=$f" \
+              | jq -c '{id, name, size}'
+          done
