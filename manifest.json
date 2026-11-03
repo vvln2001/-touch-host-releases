@@ -1,27 +1,27 @@
 {
   "schema": 1,
-  "serial": 3,
-  "issued_at": "2026-10-27T18:06:45Z",
+  "serial": 4,
+  "issued_at": "2026-11-03T08:23:40Z",
   "expires_at": null,
   "channel": "stable",
   "assets": [
     {
-      "id": "host-win64-2.4.3",
+      "id": "host-win64-2.4.4",
       "type": "host",
       "model": "ASDM02A-Host",
       "platform": "win64",
-      "version": "2.4.3",
+      "version": "2.4.4",
       "urls": [
-        "https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.3/ASDM02A-Host-2.4.3-win64.zip",
-        "https://gh-proxy.com/https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.3/ASDM02A-Host-2.4.3-win64.zip"
+        "https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.4/ASDM02A-Host-2.4.4-win64.zip",
+        "https://gh-proxy.com/https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.4/ASDM02A-Host-2.4.4-win64.zip"
       ],
       "min_compatible": "",
-      "notes": "改进：操作日志改为「操作日志」按钮，点击打开日志窗口，可查看本次运行的全部日志并复制、清空、打开日志文件夹；界面与说明文字精简。配套调试器固件 V1.8.1。",
+      "notes": "不掉电 IAP 的请求/确认/信息寄存器地址可在烧录页设置（默认 E6/E8/E9，旧固件一键切换 66/68/69），命令行同步支持。配套调试器固件 V1.8.1。",
       "forced": false,
       "debugger_version": "1.8.1",
-      "file": "ASDM02A-Host-2.4.3-win64.zip",
-      "size": 91525006,
-      "sha256": "98270e9d08b3959fd8a1211765d4b1785f4feadbc48c83769279557a29036663"
+      "file": "ASDM02A-Host-2.4.4-win64.zip",
+      "size": 91480437,
+      "sha256": "efa390437b37aab6bef8c95552eb6f15cd087c93ed02be3a0f35c471e476ad23"
     },
     {
       "id": "debugger-asdm02a-1.8.1",
@@ -29,8 +29,8 @@
       "model": "ASDM02A",
       "version": "1.8.1",
       "urls": [
-        "https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.3/ASDM02A_V1.8.1_gcc.hex",
-        "https://gh-proxy.com/https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.3/ASDM02A_V1.8.1_gcc.hex"
+        "https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.4/ASDM02A_V1.8.1_gcc.hex",
+        "https://gh-proxy.com/https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.4/ASDM02A_V1.8.1_gcc.hex"
       ],
       "min_compatible": "",
       "notes": "",
@@ -40,22 +40,22 @@
       "sha256": "bbc5ae66468abdfc7d90208bba3eafb28868cc6ba9345437089b09130de3736c"
     },
     {
-      "id": "host-win64-onefile-2.4.3",
+      "id": "host-win64-onefile-2.4.4",
       "type": "host",
       "model": "ASDM02A-Host",
       "platform": "win64-onefile",
-      "version": "2.4.3",
+      "version": "2.4.4",
       "urls": [
-        "https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.3/ASDM02A-Host-2.4.3-win64.exe",
-        "https://gh-proxy.com/https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.3/ASDM02A-Host-2.4.3-win64.exe"
+        "https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.4/ASDM02A-Host-2.4.4-win64.exe",
+        "https://gh-proxy.com/https://github.com/vvln2001/-touch-host-releases/releases/download/v2.4.4/ASDM02A-Host-2.4.4-win64.exe"
       ],
       "min_compatible": "",
-      "notes": "改进：操作日志改为「操作日志」按钮，点击打开日志窗口，可查看本次运行的全部日志并复制、清空、打开日志文件夹；界面与说明文字精简。配套调试器固件 V1.8.1。",
+      "notes": "不掉电 IAP 的请求/确认/信息寄存器地址可在烧录页设置（默认 E6/E8/E9，旧固件一键切换 66/68/69），命令行同步支持。配套调试器固件 V1.8.1。",
       "forced": false,
       "debugger_version": "1.8.1",
-      "file": "ASDM02A-Host-2.4.3-win64.exe",
-      "size": 78091852,
-      "sha256": "fed98e0792286a7afb912f1790fbff3882fa8932eb57da7f039aa8c0f59260b4"
+      "file": "ASDM02A-Host-2.4.4-win64.exe",
+      "size": 78035388,
+      "sha256": "d99eaa07c2b58e6284bf671ec65c307f56942398b982b777673873d9903d5335"
     }
   ]
 }
